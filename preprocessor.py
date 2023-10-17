@@ -36,11 +36,10 @@ def preprocess(data):
     period = []
     for hour in df[["day_name", "hour"]]["hour"]:
         if hour == 23:
-            period.append(str(hour) + "-" + str("00"))
+            period.append(str(hour).zfill(2) + "-" + str("00").zfill(2))
         elif hour == 0:
-            period.append(str("00") + "-" + str(hour + 1))
+            period.append(str("00").zfill(2) + "-" + str(hour + 1).zfill(2))
         else:
-            period.append(str(hour) + "-" + str(hour + 1))
+            period.append(str(hour).zfill(2) + "-" + str(hour + 1).zfill(2))
     df["period"] = period
-
     return df
