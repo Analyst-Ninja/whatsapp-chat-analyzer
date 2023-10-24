@@ -176,7 +176,7 @@ def get_instructions():
     st.text("Step 1: Open WhatsApp on your device")
     st.text(
         """Step 2: Choose the chat you want to analyze, whether it's a group chat or an 
-            individual conversation."""
+        individual conversation."""
     )
     st.text(
         "Step 3: In the chat, tap on the three dots (menu icon) in the top right corner."
@@ -185,7 +185,7 @@ def get_instructions():
     st.text("Step 5: Upload the .txt file.")
     st.text(
         """Step 6: You'll be prompted to choose whether you want insights for the overall
-            group or the individual chat. Make your selection."""
+        group or the individual chat. Make your selection."""
     )
     st.text("Step 6: After selecting your options, tap on " "Show Analysis" "")
     st.markdown(
