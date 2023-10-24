@@ -181,7 +181,9 @@ def get_instructions():
     st.text(
         "Step 3: In the chat, tap on the three dots (menu icon) in the top right corner."
     )
-    st.text("Step 4: Select " "Export Chat" " from the menu options.")
+    st.text(
+        "Step 4: Select " "Export Chat" " from the menu options with without media."
+    )
     st.text("Step 5: Upload the .txt file.")
     st.text(
         """Step 6: You'll be prompted to choose whether you want insights for the overall
