@@ -7,15 +7,17 @@ import seaborn as sns
 
 st.sidebar.title("WhatsApp Chat Analyzer")
 
+
 uploaded_file = st.sidebar.file_uploader("Upload a file")
+if uploaded_file is None:
+    helper.get_instructions()
+
 if uploaded_file is not None:
     bytes_data = uploaded_file.getvalue()
     data = bytes_data.decode("utf-8")
     df = preprocessor.preprocess(data)
-    # st.dataframe(df)
 
     # fetch unique users
-
     user_list = df["user"].unique().tolist()
     user_list.remove("group_notification")
     user_list.sort()

@@ -3,6 +3,7 @@ from wordcloud import WordCloud
 import pandas as pd
 from collections import Counter
 import emoji
+import streamlit as st
 
 
 # URL extractor object
@@ -168,3 +169,27 @@ def user_heatmap(selected_user, df):
     activity_heatmap.drop(columns=["day_num"], inplace=True)
 
     return activity_heatmap
+
+
+def get_instructions():
+    st.title("How to Get Insights from Your WhatsApp Chat")
+    st.text("Step 1: Open WhatsApp on your device")
+    st.text(
+        """Step 2: Choose the chat you want to analyze, whether it's a group chat or an 
+            individual conversation."""
+    )
+    st.text(
+        "Step 3: In the chat, tap on the three dots (menu icon) in the top right corner."
+    )
+    st.text("Step 4: Select " "Export Chat" " from the menu options.")
+    st.text("Step 5: Upload the .txt file.")
+    st.text(
+        """Step 6: You'll be prompted to choose whether you want insights for the overall
+            group or the individual chat. Make your selection."""
+    )
+    st.text("Step 6: After selecting your options, tap on " "Show Analysis" "")
+    st.markdown(
+        """\n\n *Note: None of your chats or the results obtained from them are stored or shared 
+        with any third party for monetary gain. Your privacy and data security are 
+        our top priorities.*"""
+    )

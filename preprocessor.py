@@ -3,7 +3,12 @@ import re
 
 
 def preprocess(data):
-    pattern = "\d{1,2}/\d{1,2}/\d{2,4},\s\d{1,2}:\d{2}\u202f[ap]m\s-\s"
+    if data[:25].find("pm") != -1 or data[:25].find("am") != -1:
+        # pattern for chat with time in AM PM format
+        pattern = "\d{1,2}/\d{1,2}/\d{2,4},\s\d{1,2}:\d{2}\u202f[ap]m\s-\s"
+    else:
+        # pattern for chat with time in HRS format
+        pattern = "\d{1,2}/\d{1,2}/\d{2,4},\s\d{1,2}:\d{2}\s-\s"
     messages = re.split(pattern, data)[1:]
     dates = re.findall(pattern, data)
     modified_dates = [word.replace("\u202f", " ")[:-3] for word in dates]
