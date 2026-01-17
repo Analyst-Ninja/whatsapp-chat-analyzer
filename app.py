@@ -3,6 +3,7 @@ import preprocessor
 import helper
 import matplotlib.pyplot as plt
 import seaborn as sns
+import plotly.express as px
 
 
 st.sidebar.title("WhatsApp Chat Analyzer")
@@ -19,7 +20,9 @@ if uploaded_file is not None:
 
     # fetch unique users
     user_list = df["user"].unique().tolist()
-    user_list.remove("group_notification")
+    if "group_notification" in user_list:
+        user_list.remove("group_notification")
+
     user_list.sort()
     user_list.insert(0, "Overall")
 
@@ -56,7 +59,9 @@ if uploaded_file is not None:
         st.title("Monthly Timeline")
         monthly_timeline = helper.monthly_timeline(selected_user, df)
         fig, ax = plt.subplots()
-        ax.plot(monthly_timeline["time"], monthly_timeline["message"], color="green")
+        ax.plot(
+            monthly_timeline["year_month"], monthly_timeline["message"], color="green"
+        )
         plt.xticks(rotation="vertical")
         st.pyplot(fig)
 
@@ -137,13 +142,8 @@ if uploaded_file is not None:
             st.dataframe(emoji_df)
 
         with col2:
-            fig, ax = plt.subplots()
-            ax.pie(
-                emoji_df["freq"].head(),
-                labels=emoji_df["emoji"].head(),
-                autopct="%0.2f",
-            )
-            st.pyplot(fig)
+            fig = px.pie(emoji_df.head(5), values="freq", names="emoji")
+            st.plotly_chart(fig)
 
         # Activity Heatmap
         st.title("Weekly Activity Map")

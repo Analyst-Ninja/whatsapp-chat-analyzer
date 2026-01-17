@@ -3,17 +3,37 @@ import re
 
 
 def preprocess(data):
-    if data[:25].find("pm") != -1 or data[:25].find("am") != -1:
-        # pattern for chat with time in AM PM format
-        pattern = "\d{1,2}/\d{1,2}/\d{2,4},\s\d{1,2}:\d{2}\u202f[ap]m\s-\s"
-    else:
-        # pattern for chat with time in HRS format
-        pattern = "\d{1,2}/\d{1,2}/\d{2,4},\s\d{1,2}:\d{2}\s-\s"
-    messages = re.split(pattern, data)[1:]
-    dates = re.findall(pattern, data)
-    modified_dates = [word.replace("\u202f", " ")[:-3] for word in dates]
-    df = pd.DataFrame({"user_message": messages, "message_date": modified_dates})
-    df["message_date"] = pd.to_datetime(df["message_date"], format="%d/%m/%y, %I:%M %p")
+    pattern = (
+        r"(?:\[\s*)?"  # optional [
+        r"(\d{1,2}/\d{1,2}/\d{2,4}),\s*"  # date
+        r"(\d{1,2}:\d{2}(?::\d{2})?)"  # time (HH:MM or HH:MM:SS)
+        r"(?:\s?(AM|PM|am|pm))?"  # optional AM/PM
+        r"(?:\s*\])?"  # optional ]
+        r"(?:\s*-\s*)?"  # optional " - "
+    )
+
+    matches = list(re.finditer(pattern, data))
+
+    dates = []
+    messages = []
+
+    for i, match in enumerate(matches):
+        date_part = match.group(1)
+        time_part = match.group(2)
+        am_pm = match.group(3) or ""
+
+        timestamp = f"{date_part}, {time_part} {am_pm}".strip()
+        dates.append(timestamp)
+
+        start = match.end()
+        end = matches[i + 1].start() if i + 1 < len(matches) else len(data)
+        messages.append(data[start:end].strip())
+
+    df = pd.DataFrame({"user_message": messages, "message_date": dates})
+
+    df["message_date"] = pd.to_datetime(
+        df["message_date"], format="mixed", dayfirst=True
+    )
 
     messages = []
     users = []
@@ -38,13 +58,10 @@ def preprocess(data):
     df["only_date"] = df["message_date"].dt.date
     df["day_num"] = df["message_date"].dt.dayofweek
 
-    period = []
-    for hour in df[["day_name", "hour"]]["hour"]:
-        if hour == 23:
-            period.append(str(hour).zfill(2) + "-" + str("00").zfill(2))
-        elif hour == 0:
-            period.append(str("00").zfill(2) + "-" + str(hour + 1).zfill(2))
-        else:
-            period.append(str(hour).zfill(2) + "-" + str(hour + 1).zfill(2))
-    df["period"] = period
+    # print(df[["hour"]].head())
+
+    df["period"] = df["hour"].apply(lambda h: f"{h:02d}-{(h + 1) % 24:02d}")
+    hour_order = [f"{h:02d}-{(h + 1) % 24:02d}" for h in range(24)]
+    df["period"] = pd.Categorical(df["period"], categories=hour_order, ordered=True)
+
     return df

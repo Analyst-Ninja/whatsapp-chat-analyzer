@@ -106,14 +106,19 @@ def monthly_timeline(selected_user, df):
     if selected_user != "Overall":
         df = df[df["user"] == selected_user]
 
-    monthly_timeline = (
-        df.groupby(["year", "month_num", "month"]).count()["message"].reset_index()
-    )
-    monthly_timeline["time"] = monthly_timeline.apply(
-        lambda row: concat(row["month"], row["year"]), axis=1
+    timeline = df.groupby(["year", "month_num"]).count()["message"].reset_index()
+
+    # Create YYYY-MM label
+    timeline["year_month"] = (
+        timeline["year"].astype(str)
+        + "-"
+        + timeline["month_num"].astype(str).str.zfill(2)
     )
 
-    return monthly_timeline
+    # Sort properly
+    timeline = timeline.sort_values(["year", "month_num"])
+
+    return timeline
 
 
 def daily_timeline(selected_user, df):
@@ -136,37 +141,32 @@ def month_activity_map(selected_user, df):
     if selected_user != "Overall":
         df = df[df["user"] == selected_user]
 
-    return df["month"].value_counts()
+    df["year_month"] = (
+        df["year"].astype(str) + "-" + df["month_num"].astype(str).str.zfill(2)
+    )
+
+    return df["year_month"].value_counts().sort_index()
 
 
 def user_heatmap(selected_user, df):
     if selected_user != "Overall":
         df = df[df["user"] == selected_user]
 
-    activity_heatmap = (
-        df.pivot_table(
-            index="day_num", columns="period", values="message", aggfunc="count"
-        )
-        .sort_values(by=["day_num"], ascending=True)
-        .fillna(0)
-        .reset_index()
-    )
+    activity_heatmap = df.pivot_table(
+        index="day_name", columns="period", values="message", aggfunc="count"
+    ).fillna(0)
 
-    def day_name(row):
-        day_dict = {
-            0: "Monday",
-            1: "Tuesday",
-            2: "Wednesday",
-            3: "Thursday",
-            4: "Friday",
-            5: "Saturday",
-            6: "Sunday",
-        }
-        return day_dict[row]
+    day_order = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+    ]
 
-    activity_heatmap["day_name_pivot"] = activity_heatmap["day_num"].apply(day_name)
-    activity_heatmap.set_index("day_name_pivot", inplace=True)
-    activity_heatmap.drop(columns=["day_num"], inplace=True)
+    activity_heatmap = activity_heatmap.reindex(day_order)
 
     return activity_heatmap
 

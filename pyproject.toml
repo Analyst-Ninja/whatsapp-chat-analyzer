@@ -1,0 +1,15 @@
+[project]
+name = "whatsapp-chat-analyzer"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "emoji>=2.15.0",
+    "pandas>=2.3.3",
+    "plotly>=6.5.2",
+    "seaborn>=0.13.2",
+    "streamlit>=1.53.0",
+    "urlextract>=1.9.0",
+    "wordcloud>=1.9.5",
+]
